@@ -90,9 +90,9 @@ export = class Jogador {
 
 		await Sql.conectar(async (sql: Sql) => {
 			try {
-				let t = await sql.scalar("select token from jogo where id = ?", [idjogo]) as string;
+				let t = await sql.scalar("select token from jogo where id = ? and tipo_pontuacao > 0", [idjogo]) as string;
 				if (!t || t !== token) {
-					res = "Jogo não encontrado ou token inválido";
+					res = "Jogo não encontrado, sem pontuação ou token inválido";
 					return;
 				}
 				await sql.query("insert into pontuacao (idjogo, idjogador, valor, data) values (?, ?, ?, now())", [idjogo, id, valor]);

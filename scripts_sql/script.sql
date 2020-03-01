@@ -24,6 +24,7 @@ CREATE TABLE jogo (
   url_externa varchar(200) NOT NULL,
   data_cadastro datetime NOT NULL,
   ordem int NOT NULL,
+  tipo_pontuacao tinyint(4) NOT NULL,
   PRIMARY KEY (id),
   KEY idusuario_FK_idx (idusuario),
   UNIQUE KEY nome_UN (nome),
