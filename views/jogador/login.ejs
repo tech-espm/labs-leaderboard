@@ -1,0 +1,92 @@
+﻿<form method="post" id="form">
+	<div class="painel-msg">
+		<div class="panel panel-default no-margin-bottom">
+			<div class="panel-body">
+				<p class="text-center"><img alt="ESPM" src="<%- root %>/imagens/logo.png" width="100" /></p>
+
+				<div class="row">
+					<div class="col-sm-6">
+						<br />
+						Ainda não se cadastrou no leaderboard da ESPM?
+						<br />
+						<br />
+						<% if (criacao) { %>
+						Basta digitar seu nome e seu e-mail ao lado! Nem precisa de senha! 😊
+						<br />
+						<br />
+						<a href="<%- root %>/jogador?callback=<%=callback %>">Já possui cadastro? Clique aqui para jogar!</a>
+						<% } else { %>
+						<a href="<%- root %>/jogador/registro?callback=<%=callback %>">Clique aqui e cadastre-se agora mesmo! 😊</a>
+						<br />
+						<br />
+						Já possui cadastro? Basta digitar seu e-mail para jogar!
+						<% } %>
+						<br />
+						<br />
+					</div>
+
+					<div class="col-sm-6 text-left">
+						<% if (criacao) { %>
+						<div class="form-group">
+							<label for="nome">Nome</label>
+							<input name="nome" type="text" id="nome" maxlength="100" class="form-control" spellcheck="false" />
+						</div>
+						<% } %>
+						<div class="form-group">
+							<label for="email">E-mail</label>
+							<input name="email" type="email" id="email" maxlength="100" class="form-control" spellcheck="false" />
+						</div>
+						<div class="form-group no-margin-bottom">
+							<input type="submit" value="<%-(criacao ? 'Quero me cadastrar!' : 'Jogar!')%>" class="btn btn-primary btn-block" />
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</form>
+
+<%- contentFor("scripts") %>
+<script type="text/javascript">
+	//<![CDATA[
+	"use strict";
+
+	$("#form").validate({
+		rules: {
+			// <% if (criacao) { %>
+			nome: {
+				required: true,
+				maxlength: 100
+			},
+			// <% } %>
+			email: {
+				required: true,
+				maxlength: 100,
+				email: true
+			}
+		},
+		submitHandler: function (form) {
+			if (JsonWebApi.active)
+				return;
+
+			Notification.wait();
+
+			JsonWebApi.postFormData("<%- root %>/api/jogador/login?criacao=<%-(criacao ? '1' : '0')%>", form, function (response) {
+				if (response.success) {
+					// <% if (callback) { %>
+					window.location.href = "<%-callback %>";
+					// <% } else if (criacao) { %>
+					resetForm("#form");
+					Notification.success("Jogador criado com sucesso! \uD83D\uDE04");
+					// <% } else { %>
+					Notification.success("Jogador identificado com sucesso! Agora é só jogar! \uD83D\uDE04");
+					// <% } %>
+				} else {
+					Notification.error(response.value, true);
+				}
+			});
+		}
+	});
+
+	//]]>
+</script>

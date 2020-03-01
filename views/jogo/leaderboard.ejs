@@ -1,0 +1,124 @@
+﻿<div style="max-width: 600px; margin: 0 auto; padding: 10% 15px;">
+	<div class="panel panel-default no-margin-bottom">
+		<div class="panel-body">
+			<div>
+				<a style="float: right;" title="Página do jogo" target="_blank" href="<%- url_externa %>" class="btn btn-default btn-outline"><i class="fa fa-external-link fa-nomargin"></i></a>
+			</div>
+			<h1><%= titulo %></h1>
+			<div class="row">
+				<div class="col-xs-6">
+					<button type="button" id="btnHoje" class="btn btn-default btn-outline btn-block" onclick="listarHoje()"><i class="fa fa-calendar"></i>Hoje</button>
+				</div>
+				<div class="col-xs-6">
+					<button type="button" id="btnGeral" class="btn btn-default btn-outline btn-block" onclick="listarGeral()"><i class="fa fa-trophy"></i>Geral</button>
+				</div>
+			</div>
+			<div id="leaderboardContainer"></div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor("styles") %>
+<style type="text/css">
+	h1 {
+		text-align: center;
+		margin: 0 0 40px;
+	}
+	.item-lb {
+		padding: 20px;
+		background: #fff;
+		border-radius: 4px;
+		-webkit-box-shadow: 0 2px 8px rgba(0,0,0,.5);
+		box-shadow: 0 2px 8px rgba(0,0,0,.5);
+	}
+	.item-lb + .item-lb {
+		margin-top: 20px;
+	}
+	h2, h3 {
+		margin: 0 0 20px;
+	}
+	h2 {
+		color: #643c9f;
+		text-align: center;
+	}
+	h3 {
+		color: #eb0f6c;
+	}
+	b {
+		float: right;
+	}
+	.item-lb-data {
+		text-align: right;
+	}
+</style>
+
+<%- contentFor("scripts") %>
+<script type="text/javascript">
+	//<![CDATA[
+	"use strict";
+
+	function listar(lista, hoje) {
+		Notification.hide();
+
+		var i, item, html = "<hr/>";
+
+		if (!lista || !lista.length) {
+			html += '<div class="item-lb"><h2>Nada para ver aqui!</h2><div class="text-center">Excelente motivo para ir jogar um pouco! 😅</div></div>';
+		} else {
+			for (i = 0; i < lista.length; i++) {
+				item = lista[i];
+
+				html += '<div class="item-lb">';
+				html += '<h2>' + encode(item.nome) + '</h2>';
+				html += '<h3 class="clearfix">';
+				if (i <= 2)
+					html += '<i class="fa fa-trophy"></i>';
+				html += (i + 1) + 'º lugar&nbsp;<b>' + item.valor + '</b></h3>';
+				if (hoje)
+					html += '<div class="item-lb-data"><i class="fa fa-clock-o"></i>' + item.hora + '</div>';
+				else
+					html += '<div class="item-lb-data"><i class="fa fa-calendar"></i>' + item.dia + ' às ' + item.hora + '</div>';
+				html += '</div>';
+			}
+		}
+
+		document.getElementById(hoje ? "btnGeral" : "btnHoje").className = "btn btn-default btn-outline btn-block";
+		document.getElementById(hoje ? "btnHoje" : "btnGeral").className = "btn btn-primary btn-block";
+
+		$("#leaderboardContainer").html(html);
+	}
+
+	function listarHoje() {
+		if (JsonWebApi.active)
+			return;
+
+		var hoje = new Date();
+
+		Notification.wait();
+
+		JsonWebApi.get("<%- root %>/api/jogo/listarPontuacaoData", function (response) {
+			if (response.success)
+				listar(response.value, true);
+			else
+				Notification.error(response.value, true);
+		}, "idjogo", "<%- id %>", "data", hoje.getFullYear() + "-" + (hoje.getMonth() + 1) + "-" + hoje.getDate());
+	}
+
+	function listarGeral() {
+		if (JsonWebApi.active)
+			return;
+
+		Notification.wait();
+
+		JsonWebApi.get("<%- root %>/api/jogo/listarPontuacao", function (response) {
+			if (response.success)
+				listar(response.value, false);
+			else
+				Notification.error(response.value, true);
+		}, "idjogo", "<%- id %>");
+	}
+
+	listarGeral();
+
+	//]]>
+</script>
