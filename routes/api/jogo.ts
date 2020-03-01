@@ -28,7 +28,11 @@ router.post("/criar", wrap(async (req: express.Request, res: express.Response) =
 	if (!u)
 		return;
 	let j = req.body as Jogo;
-	j.idusuario = u.id;
+	if (j) {
+		j.idusuario = u.id;
+		j.ordem = parseInt(req.body.ordem);
+		j.tipo_pontuacao = parseInt(req.body.tipo_pontuacao);
+	}
 	jsonRes(res, 400, j ? await Jogo.criar(j) : "Dados inválidos!");
 }));
 
@@ -40,6 +44,8 @@ router.post("/alterar", wrap(async (req: express.Request, res: express.Response)
 	if (j) {
 		j.id = parseInt(req.body.id);
 		j.idusuario = j.id;
+		j.ordem = parseInt(req.body.ordem);
+		j.tipo_pontuacao = parseInt(req.body.tipo_pontuacao);
 	}
 	jsonRes(res, 400, (j && !isNaN(j.id)) ? await Jogo.alterar(j) : "Dados inválidos!");
 }));

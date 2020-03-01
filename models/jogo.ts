@@ -8,6 +8,7 @@ export = class Jogo {
 	public url_externa: string;
 	public data_cadastro: string;
 	public ordem: number;
+	public tipo_pontuacao: number;
 
 	private static validar(j: Jogo): string {
 		j.nome = (j.nome || "").normalize().trim();
@@ -19,6 +20,7 @@ export = class Jogo {
 		j.url_externa = (j.url_externa || "").normalize().trim();
 		if (j.url_externa.length > 200)
 			return "Token inválido";
+		j.tipo_pontuacao = (j.tipo_pontuacao ? 1 : 0);
 		return null;
 	}
 
@@ -36,7 +38,7 @@ export = class Jogo {
 		let lista: Jogo[] = null;
 
 		await Sql.conectar(async (sql: Sql) => {
-			lista = await sql.query("select id, idusuario, nome, token, url_externa, date_format(data_cadastro, '%d/%m/%Y') data_cadastro from jogo where id = ?", [id]) as Jogo[];
+			lista = await sql.query("select id, idusuario, nome, token, url_externa, date_format(data_cadastro, '%d/%m/%Y') data_cadastro, ordem, tipo_pontuacao from jogo where id = ?", [id]) as Jogo[];
 		});
 
 		return ((lista && lista[0]) || null);
@@ -49,7 +51,7 @@ export = class Jogo {
 
 		await Sql.conectar(async (sql: Sql) => {
 			try {
-				await sql.query("insert into jogo (idusuario, nome, token, url_externa, data_cadastro, ordem) values (?, ?, ?, ?, now(), 0)", [j.idusuario, j.nome, j.token, j.url_externa]);
+				await sql.query("insert into jogo (idusuario, nome, token, url_externa, data_cadastro, ordem, tipo_pontuacao) values (?, ?, ?, ?, now(), 0, ?)", [j.idusuario, j.nome, j.token, j.url_externa, j.tipo_pontuacao]);
 				res = (await sql.scalar("select last_insert_id()") as number).toString();
 			} catch (e) {
 				switch (e.code) {
@@ -76,7 +78,7 @@ export = class Jogo {
 
 		await Sql.conectar(async (sql: Sql) => {
 			try {
-				await sql.query("update jogo set nome = ?, token = ?, url_externa = ? where id = ?", [j.nome, j.token, j.url_externa, j.id]);
+				await sql.query("update jogo set nome = ?, token = ?, url_externa = ?, tipo_pontuacao = ? where id = ?", [j.nome, j.token, j.url_externa, j.tipo_pontuacao, j.id]);
 				res = sql.linhasAfetadas.toString();
 			} catch (e) {
 				if (e.code && e.code === "ER_DUP_ENTRY")

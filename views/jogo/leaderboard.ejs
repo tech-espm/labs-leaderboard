@@ -28,8 +28,8 @@
 		padding: 20px;
 		background: #fff;
 		border-radius: 4px;
-		-webkit-box-shadow: 0 2px 8px rgba(0,0,0,.5);
-		box-shadow: 0 2px 8px rgba(0,0,0,.5);
+		-webkit-box-shadow: 0 1px 3px rgba(0,0,0,.5);
+		box-shadow: 0 1px 3px rgba(0,0,0,.5);
 	}
 	.item-lb + .item-lb {
 		margin-top: 20px;
@@ -62,8 +62,14 @@
 
 		var i, item, html = "<hr/>";
 
+		// <% if (!tipo_pontuacao) { %>
+
+		html += '<div class="item-lb"><h2>Este jogo não possui leaderboard!</h2><div class="text-center">Mas isso não é motivo para deixar de jogar! 😅</div></div>';
+
+		// <% } else { %>
+
 		if (!lista || !lista.length) {
-			html += '<div class="item-lb"><h2>Nada para ver aqui!</h2><div class="text-center">Excelente motivo para ir jogar um pouco! 😅</div></div>';
+			html += '<div class="item-lb"><h2>Nada para ver aqui, por enquanto!</h2><div class="text-center">Excelente motivo para ir jogar um pouco! 😅</div></div>';
 		} else {
 			for (i = 0; i < lista.length; i++) {
 				item = lista[i];
@@ -81,6 +87,8 @@
 				html += '</div>';
 			}
 		}
+
+		// <% } %>
 
 		document.getElementById(hoje ? "btnGeral" : "btnHoje").className = "btn btn-default btn-outline btn-block";
 		document.getElementById(hoje ? "btnHoje" : "btnGeral").className = "btn btn-primary btn-block";

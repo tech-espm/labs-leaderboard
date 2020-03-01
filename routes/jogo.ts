@@ -46,7 +46,7 @@ router.get("/:i", wrap(async (req: express.Request, res: express.Response) => {
 		id = 0;
 	else
 		j = await Jogo.obter(id);
-	res.render("jogo/leaderboard", { layout: "layout-externo", imagemFundo: true, titulo: (j ? j.nome : undefined), url_externa: (j ? j.url_externa : ""), id: id });
+	res.render("jogo/leaderboard", { layout: "layout-externo", imagemFundo: true, titulo: (j ? j.nome : undefined), url_externa: (j ? j.url_externa : ""), tipo_pontuacao: j.tipo_pontuacao, id: id });
 }));
 
 export = router;

@@ -10,12 +10,20 @@
 					<input id="nome" name="nome" maxlength="100" class="form-control" type="text" spellcheck="false" value="<%=(item ? item.nome : '') %>" />
 				</div>
 				<div class="form-group">
-					<label for="token">Token</label>
+					<label for="token">Token <i class="fa fa-info-circle" id="tooltipToken" data-toggle="tooltip" data-placement="top" title="O token age como uma senha para que a pontuação possa ser marcada pelo jogo. Caso o token 'vaze', basta alterá-lo aqui."></i></label>
 					<input id="token" name="token" maxlength="50" class="form-control" type="text" spellcheck="false" value="<%=(item ? item.token : '') %>" />
 				</div>
 				<div class="form-group">
 					<label for="url_externa">URL Externa</label>
 					<input id="url_externa" name="url_externa" maxlength="200" class="form-control" type="url" spellcheck="false" value="<%=(item ? item.url_externa : '') %>" />
+				</div>
+				<div class="form-group">
+					<label for="tipo_pontuacao">Tipo de Pontuação</label>
+					<select id="tipo_pontuacao" name="tipo_pontuacao" size="1" class="form-control">
+						<option value="" <%=(!item ? 'selected="selected"' : '') %>>SELECIONE...</option>	
+						<option value="0" <%=((item && item.tipo_pontuacao === 0) ? 'selected="selected"' : '') %>>SEM PONTUAÇÃO</option>	
+						<option value="1" <%=((item && item.tipo_pontuacao === 1) ? 'selected="selected"' : '') %>>COM PONTUAÇÃO</option>	
+					</select>
 				</div>
 			</div>
 			<div class="panel-footer">
@@ -30,6 +38,8 @@
 	//<![CDATA[
 	"use strict";
 
+	$("#tooltipToken").tooltip();
+
 	$("#form").validate({
 		rules: {
 			nome: {
@@ -42,6 +52,10 @@
 			},
 			url_externa: {
 				maxlength: 200
+			},
+			tipo_pontuacao: {
+				required: true,
+				number: true
 			}
 		},
 
