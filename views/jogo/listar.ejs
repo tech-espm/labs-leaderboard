@@ -39,11 +39,13 @@
 		deferRender: true,
 		columns: [
 			{ title: "", "class": "col-min", searchable: false, orderable: false, data: null, render: function (v, type, row) { return "<a target=\"_blank\" title=\"Editar\" href=\"<%- root %>/jogo/alterar?id=" + row.id + "\" class=\"btn btn-outline btn-primary\"><i class=\"fa fa-nomargin fa-edit\"></i></a> <a target=\"_blank\" title=\"Leaderboard\" href=\"<%- root %>/jogo/" + row.id + "\" class=\"btn btn-outline btn-default\"><i class=\"fa fa-nomargin fa-trophy\"></i></a> <button title=\"Excluir\" type=\"button\" data-excluir=\"1\" class=\"btn btn-outline btn-danger\"><i class=\"fa fa-nomargin fa-times\"></i></button>"; } },
-			{ title: "Id", "class": "col-min", "type": "num", data: "id" },
-			{ title: "Criação", "class": "col-min", "type": "customdateint", data: "data_cadastro" },
+			//{ title: "Id", "class": "col-min", "type": "num", data: "id" },
 			{ title: "Nome", render: encode, data: "nome" },
 			{ title: "Token", render: encode, data: "token" },
-			{ title: "URL Externa", data: "url_externa", render: function (v, type, row) { var e = encode(v); return "<a target=\"_blank\" href=\"" + e + "\">" + e + "</a>"; } },
+			{ title: "Imagem", "class": "text-center", searchable: false, orderable: false, data: null, render: function (v, type, row) { return "<a target=\"_blank\" title=\"Imagem do jogo\" href=\"<%- root %>/screenshots/" + row.id + ".jpg?" + row.versao + "\" class=\"btn btn-outline btn-default\"><i class=\"fa fa-nomargin fa-image\"></i></a>"; } },
+			{ title: "URL Externa", "class": "text-center", data: "url_externa", searchable: false, orderable: false, render: function (v, type, row) { var e = encode(v); return (e ? "<a target=\"_blank\" title=\"Acessar jogo\" href=\"" + e + "\" class=\"btn btn-outline btn-default\"><i class=\"fa fa-nomargin fa-external-link\"></i></a>" : ""); } },
+			{ title: "URL do Repositório", "class": "text-center", data: "url_repositorio", searchable: false, orderable: false, render: function (v, type, row) { var e = encode(v); return (e ? "<a target=\"_blank\" title=\"Acessar repositório\" href=\"" + e + "\" class=\"btn btn-outline btn-default\"><i class=\"fa fa-nomargin fa-code\"></i></a>" : ""); } },
+			{ title: "Criação", "class": "col-min", "type": "customdateint", data: "data_cadastro" },
 		],
 		data: <%- lista %>,
 		export: { title: "Jogos" }
@@ -79,7 +81,7 @@
 
 		JsonWebApi.get("<%- root %>/api/jogo/excluir", function (response) {
 			if (response.success) {
-				Notification.success("Jogo excluído com sucesso! \uD83D\uDE04");
+				Notification.success("Jogo excluído com sucesso! " + emoji.happy);
 				tabela.row(trClicada).remove().draw();
 			} else {
 				Notification.error(response.value, true);

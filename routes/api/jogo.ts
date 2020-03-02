@@ -1,4 +1,5 @@
 ﻿import express = require("express");
+import multer = require("multer");
 import wrap = require("express-async-error-wrapper");
 import dataISOValida = require("../../utils/dataISOValida");
 import jsonRes = require("../../utils/jsonRes");
@@ -7,6 +8,10 @@ import Usuario = require("../../models/usuario");
 import Jogo = require("../../models/jogo");
 
 const router = express.Router();
+
+function validarArquivoImagem(arquivo: any): boolean {
+	return (!arquivo || (arquivo.buffer && arquivo.size && arquivo.size <= Jogo.tamanhoMaximoImagemEmBytes));
+}
 
 router.get("/listar", wrap(async (req: express.Request, res: express.Response) => {
 	let u = await Usuario.cookie(req, res);
@@ -23,20 +28,19 @@ router.get("/obter", wrap(async (req: express.Request, res: express.Response) =>
 	res.json(isNaN(id) ? null : await Jogo.obter(id));
 }));
 
-router.post("/criar", wrap(async (req: express.Request, res: express.Response) => {
+router.post("/criar", multer().single("imagem"), wrap(async (req: express.Request, res: express.Response) => {
 	let u = await Usuario.cookie(req, res);
 	if (!u)
 		return;
 	let j = req.body as Jogo;
 	if (j) {
 		j.idusuario = u.id;
-		j.ordem = parseInt(req.body.ordem);
 		j.tipo_pontuacao = parseInt(req.body.tipo_pontuacao);
 	}
-	jsonRes(res, 400, j ? await Jogo.criar(j) : "Dados inválidos!");
+	jsonRes(res, 400, (j && req["file"] && validarArquivoImagem(req["file"])) ? await Jogo.criar(j, req["file"]) : "Dados inválidos!");
 }));
 
-router.post("/alterar", wrap(async (req: express.Request, res: express.Response) => {
+router.post("/alterar", multer().single("imagem"), wrap(async (req: express.Request, res: express.Response) => {
 	let u = await Usuario.cookie(req, res);
 	if (!u)
 		return;
@@ -44,10 +48,9 @@ router.post("/alterar", wrap(async (req: express.Request, res: express.Response)
 	if (j) {
 		j.id = parseInt(req.body.id);
 		j.idusuario = j.id;
-		j.ordem = parseInt(req.body.ordem);
 		j.tipo_pontuacao = parseInt(req.body.tipo_pontuacao);
 	}
-	jsonRes(res, 400, (j && !isNaN(j.id)) ? await Jogo.alterar(j) : "Dados inválidos!");
+	jsonRes(res, 400, (j && !isNaN(j.id) && validarArquivoImagem(req["file"])) ? await Jogo.alterar(j, req["file"]) : "Dados inválidos!");
 }));
 
 router.get("/excluir", wrap(async (req: express.Request, res: express.Response) => {

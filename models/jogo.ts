@@ -1,14 +1,27 @@
 ﻿import Sql = require("../infra/sql");
+import FS = require("../infra/fs");
+import Upload = require("../infra/upload");
 
 export = class Jogo {
+	public static readonly tamanhoMaximoImagemEmKiB = 512;
+	public static readonly tamanhoMaximoImagemEmBytes = Jogo.tamanhoMaximoImagemEmKiB << 10;
+	public static readonly caminhoRelativoPasta = "public/screenshots";
+	public static readonly extensaoImagem = "jpg";
+
 	public id: number;
 	public idusuario: number;
 	public nome: string;
 	public token: string;
 	public url_externa: string;
+	public url_repositorio: string;
 	public data_cadastro: string;
 	public ordem: number;
 	public tipo_pontuacao: number;
+	public versao: number;
+
+	private static caminhoRelativoArquivo(id: number): string {
+		return `${Jogo.caminhoRelativoPasta}/${id}.${Jogo.extensaoImagem}`;
+	}
 
 	private static validar(j: Jogo): string {
 		j.nome = (j.nome || "").normalize().trim();
@@ -19,7 +32,10 @@ export = class Jogo {
 			return "Token inválido";
 		j.url_externa = (j.url_externa || "").normalize().trim();
 		if (j.url_externa.length > 200)
-			return "Token inválido";
+			return "URL externa inválida";
+		j.url_repositorio = (j.url_repositorio || "").normalize().trim();
+		if (j.url_repositorio.length > 200)
+			return "URL do repositório inválida";
 		j.tipo_pontuacao = (j.tipo_pontuacao ? 1 : 0);
 		return null;
 	}
@@ -28,7 +44,7 @@ export = class Jogo {
 		let lista: Jogo[] = null;
 
 		await Sql.conectar(async (sql: Sql) => {
-			lista = await sql.query("select id, idusuario, nome, token, url_externa, date_format(data_cadastro, '%d/%m/%Y') data_cadastro, ordem from jogo order by nome asc") as Jogo[];
+			lista = await sql.query("select id, idusuario, nome, token, url_externa, url_repositorio, date_format(data_cadastro, '%d/%m/%Y') data_cadastro, ordem, tipo_pontuacao, versao from jogo") as Jogo[];
 		});
 
 		return (lista || []);
@@ -38,21 +54,34 @@ export = class Jogo {
 		let lista: Jogo[] = null;
 
 		await Sql.conectar(async (sql: Sql) => {
-			lista = await sql.query("select id, idusuario, nome, token, url_externa, date_format(data_cadastro, '%d/%m/%Y') data_cadastro, ordem, tipo_pontuacao from jogo where id = ?", [id]) as Jogo[];
+			lista = await sql.query("select id, idusuario, nome, token, url_externa, url_repositorio, date_format(data_cadastro, '%d/%m/%Y') data_cadastro, ordem, tipo_pontuacao, versao from jogo where id = ?", [id]) as Jogo[];
 		});
 
 		return ((lista && lista[0]) || null);
 	}
 
-	public static async criar(j: Jogo): Promise<string> {
+	public static async criar(j: Jogo, arquivo: any): Promise<string> {
 		let res: string;
 		if ((res = Jogo.validar(j)))
 			return res;
 
 		await Sql.conectar(async (sql: Sql) => {
 			try {
-				await sql.query("insert into jogo (idusuario, nome, token, url_externa, data_cadastro, ordem, tipo_pontuacao) values (?, ?, ?, ?, now(), 0, ?)", [j.idusuario, j.nome, j.token, j.url_externa, j.tipo_pontuacao]);
-				res = (await sql.scalar("select last_insert_id()") as number).toString();
+				await sql.beginTransaction();
+
+				await sql.query("insert into jogo (idusuario, nome, token, url_externa, url_repositorio, data_cadastro, ordem, tipo_pontuacao, versao) values (?, ?, ?, ?, ?, now(), 0, ?, 0)", [j.idusuario, j.nome, j.token, j.url_externa, j.url_repositorio, j.tipo_pontuacao]);
+				j.id = await sql.scalar("select last_insert_id()") as number;
+
+				// Chegando aqui, significa que a inclusão foi bem sucedida.
+				// Logo, podemos tentar criar o arquivo físico. Se a criação do
+				// arquivo não funcionar, uma exceção ocorrerá, e a transação será
+				// desfeita, já que o método commit() não executará, e nossa classe
+				// Sql já executa um rollback() por nós nesses casos.
+				await Upload.gravarArquivo(arquivo, Jogo.caminhoRelativoPasta, j.id + "." + Jogo.extensaoImagem);
+
+				res = j.id.toString();
+
+				await sql.commit();
 			} catch (e) {
 				switch (e.code) {
 					case "ER_DUP_ENTRY":
@@ -71,15 +100,29 @@ export = class Jogo {
 		return res;
 	}
 
-	public static async alterar(j: Jogo): Promise<string> {
+	public static async alterar(j: Jogo, arquivo: any): Promise<string> {
 		let res: string;
 		if ((res = Jogo.validar(j)))
 			return res;
 
 		await Sql.conectar(async (sql: Sql) => {
 			try {
-				await sql.query("update jogo set nome = ?, token = ?, url_externa = ?, tipo_pontuacao = ? where id = ?", [j.nome, j.token, j.url_externa, j.tipo_pontuacao, j.id]);
+				await sql.beginTransaction();
+
+				await sql.query("update jogo set nome = ?, token = ?, url_externa = ?, url_repositorio = ?, tipo_pontuacao = ?, versao = versao + 1 where id = ?", [j.nome, j.token, j.url_externa, j.url_repositorio, j.tipo_pontuacao, j.id]);
+
+				if (sql.linhasAfetadas && arquivo && arquivo.buffer && arquivo.size) {
+					// Chegando aqui, significa que a inclusão foi bem sucedida.
+					// Logo, podemos tentar criar o arquivo físico. Se a criação do
+					// arquivo não funcionar, uma exceção ocorrerá, e a transação será
+					// desfeita, já que o método commit() não executará, e nossa classe
+					// Sql já executa um rollback() por nós nesses casos.
+					await Upload.gravarArquivo(arquivo, Jogo.caminhoRelativoPasta, j.id + "." + Jogo.extensaoImagem);
+				}
+
 				res = sql.linhasAfetadas.toString();
+
+				await sql.commit();
 			} catch (e) {
 				if (e.code && e.code === "ER_DUP_ENTRY")
 					res = "O jogo \"" + j.nome + "\" já existe";
@@ -95,8 +138,24 @@ export = class Jogo {
 		let res: string = null;
 
 		await Sql.conectar(async (sql: Sql) => {
+			await sql.beginTransaction();
+
 			await sql.query("delete from jogo where id = ?", [id]);
+
+			if (sql.linhasAfetadas) {
+				// Chegando aqui, significa que a exclusão foi bem sucedida.
+				// Logo, podemos tentar excluir o arquivo físico. Se a exclusão do
+				// arquivo não funcionar, uma exceção ocorrerá, e a transação será
+				// desfeita, já que o método commit() não executará, e nossa classe
+				// Sql já executa um rollback() por nós nesses casos.
+				let caminho = Jogo.caminhoRelativoArquivo(id);
+				if (await FS.existeArquivo(caminho))
+					await FS.excluirArquivo(caminho);
+			}
+
 			res = sql.linhasAfetadas.toString();
+
+			await sql.commit();
 		});
 
 		return res;

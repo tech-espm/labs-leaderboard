@@ -18,12 +18,20 @@
 					<input id="url_externa" name="url_externa" maxlength="200" class="form-control" type="url" spellcheck="false" value="<%=(item ? item.url_externa : '') %>" />
 				</div>
 				<div class="form-group">
+					<label for="url_repositorio">URL do Repositório</label>
+					<input id="url_repositorio" name="url_repositorio" maxlength="200" class="form-control" type="url" spellcheck="false" value="<%=(item ? item.url_repositorio : '') %>" />
+				</div>
+				<div class="form-group">
 					<label for="tipo_pontuacao">Tipo de Pontuação</label>
 					<select id="tipo_pontuacao" name="tipo_pontuacao" size="1" class="form-control">
 						<option value="" <%=(!item ? 'selected="selected"' : '') %>>SELECIONE...</option>	
 						<option value="0" <%=((item && item.tipo_pontuacao === 0) ? 'selected="selected"' : '') %>>SEM PONTUAÇÃO</option>	
 						<option value="1" <%=((item && item.tipo_pontuacao === 1) ? 'selected="selected"' : '') %>>COM PONTUAÇÃO</option>	
 					</select>
+				</div>
+				<div class="form-group">
+					<label for="imagem">Imagem</label>
+					<input id="imagem" name="imagem" class="form-control" type="file" accept="image/*" />
 				</div>
 			</div>
 			<div class="panel-footer">
@@ -40,6 +48,18 @@
 
 	$("#tooltipToken").tooltip();
 
+	function gerarPNGVazio() {
+		return new Uint8Array([
+			0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52,
+			0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4,
+			0x89, 0x00, 0x00, 0x00, 0x0B, 0x49, 0x44, 0x41, 0x54, 0x08, 0xD7, 0x63, 0x60, 0x00, 0x02, 0x00,
+			0x00, 0x05, 0x00, 0x01, 0xE2, 0x26, 0x05, 0x9B, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44,
+			0xAE, 0x42, 0x60, 0x82
+		]);
+	}
+
+	var preparandoImagem = false;
+
 	$("#form").validate({
 		rules: {
 			nome: {
@@ -53,39 +73,100 @@
 			url_externa: {
 				maxlength: 200
 			},
+			url_repositorio: {
+				maxlength: 200
+			},
 			tipo_pontuacao: {
 				required: true,
 				number: true
+			},
+			imagem: {
+				suporteArquivoAvancado: true,
+				tamanhoArquivoMinimoBytes: 128,
+				tamanhoArquivoMaximoKiB: 512,
+				extensaoArquivo: [".png", ".jpg", ".jpeg"]
 			}
 		},
 
 		submitHandler: function (form) {
-			if (JsonWebApi.active)
+			if (JsonWebApi.active || preparandoImagem)
 				return;
+
+			var formData = new FormData(form), imagem = document.getElementById("imagem");
+
+			function erroImagem() {
+				preparandoImagem = false;
+				Notification.error("Ocorreu um erro durante o processamento da imagem " + emoji.sad, true);
+			}
+
+			function prepararImagem(arquivo) {
+				preparandoImagem = true;
+
+				var reader = new FileReader();
+				reader.onload = function () {
+					debugger;
+					var image = new Image();
+					image.onload = function () {
+						debugger;
+						var w = image.width, h = image.height;
+
+						preparandoImagem = false;
+
+						if (w < 128 || h < 128) {
+							Notification.error("A imagem é muito pequena (largura e altura devem ser maiores do que 100 pixels) " + emoji.sad, true);
+							return;
+						}
+
+						if (w > 2000 || h > 2000) {
+							Notification.error("A imagem é muito grande (largura e altura devem ser menores do que 2000 pixels) " + emoji.sad, true);
+							return;
+						}
+
+						terminar(true);
+					};
+					image.onerror = erroImagem;
+					image.src = reader.result;
+				};
+				reader.onerror = erroImagem;
+				reader.readAsDataURL(arquivo);
+			}
+
+			function terminar(temImagem) {
+				debugger;
+				//<% if (item) { %>
+
+				JsonWebApi.postFormData("<%- root %>/api/jogo/alterar", formData, function (response) {
+					if (response.success) {
+						imagem.value = "";
+						Notification.success("Jogo alterado com sucesso! " + emoji.happy);
+					} else {
+						Notification.error(response.value, true);
+					}
+				});
+
+				//<% } else { %>
+
+				if (!temImagem)
+					formData.append("imagem", new Blob([gerarPNGVazio()], { type: "image/png" }));
+
+				JsonWebApi.postFormData("<%- root %>/api/jogo/criar", formData, function (response) {
+					if (response.success) {
+						resetForm("#form");
+						Notification.success("Jogo criado com sucesso! " + emoji.happy);
+					} else {
+						Notification.error(response.value, true);
+					}
+				});
+
+				//<% } %>
+			}
 
 			Notification.wait();
 
-			//<% if (item) { %>
-
-			JsonWebApi.postFormData("<%- root %>/api/jogo/alterar", form, function (response) {
-				if (response.success)
-					Notification.success("Jogo alterado com sucesso! \uD83D\uDE04");
-				else
-					Notification.error(response.value, true);
-			});
-
-			//<% } else { %>
-
-			JsonWebApi.postFormData("<%- root %>/api/jogo/criar", form, function (response) {
-				if (response.success) {
-					resetForm("#form");
-					Notification.success("Jogo criado com sucesso! \uD83D\uDE04");
-				} else {
-					Notification.error(response.value, true);
-				}
-			});
-
-			//<% } %>
+			if (imagem.files && imagem.files[0])
+				prepararImagem(imagem.files[0]);
+			else
+				terminar(false);
 		}
 	});
 	//]]>
