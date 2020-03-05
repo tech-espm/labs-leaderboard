@@ -21,7 +21,7 @@ async function casLogin(req: express.Request, res: express.Response) {
 		if (mensagem)
 			res.render("home/login", { layout: "layout-externo", imagemFundo: true, mensagem: `O usuário ${cas.emailAcademico.toUpperCase()} não está cadastrado no sistema. Por favor, entre em contato com um administrador do sistema para obter acesso.`, loginUrl: appsettings.loginUrl });
 		else
-			res.redirect(appsettings.root + "/");
+			res.redirect(appsettings.root + "/admin");
 	} else {
 		res.render("home/login", { layout: "layout-externo", imagemFundo: true, mensagem: ((mensagem || "Não foi possível efetuar login no servidor remoto.") + " Por favor, tente novamente mais tarde."), loginUrl: appsettings.loginUrl });
 	}

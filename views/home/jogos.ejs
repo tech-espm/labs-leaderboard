@@ -1,0 +1,106 @@
+﻿<style type="text/css">
+	.jogo {
+		position: relative;
+		overflow: hidden;
+		margin: 0 0 75px;
+		padding: 0;
+		height: 300px;
+		color: #fff;
+		background-color: #000;
+		background-size: cover;
+		background-position: center;
+		border-radius: 4px;
+		-webkit-box-shadow: 0 1px 3px rgba(0,0,0,.5);
+		box-shadow: 0 1px 3px rgba(0,0,0,.5);
+		cursor: pointer;
+	}
+
+		.jogo > h2, .jogo > nav {
+			margin: 0;
+			background: rgba(0,0,0,.85);
+		}
+
+		.jogo > h2 {
+			padding: 0;
+			text-align: center;
+			font-weight: 400;
+			font-family: Montserrat, "Open Sans", "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+			font-size: 25px;
+			-webkit-box-shadow: 0 1px 4px #000;
+			box-shadow: 0 1px 4px #000;
+		}
+
+			.jogo > h2 > a {
+				display: block;
+				margin: 0;
+				padding: 8px 16px;
+				color: #fff;
+			}
+
+		.jogo > nav {
+			position: absolute;
+			padding: 8px 0;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			cursor: default;
+			-webkit-box-shadow: 0 -1px 4px #000;
+			box-shadow: 0 -1px 4px #000;
+		}
+
+			.jogo > nav > a {
+				color: #fff;
+				padding: 0 16px;
+				font-size: 20px;
+			}
+
+@media (max-width: 767px) {
+	.jogo {
+		margin-bottom: 50px;
+	}
+}
+
+@media (max-width: 500px) {
+	.jogo {
+		height: 250px;
+	}
+}
+
+@media (max-width: 400px) {
+	.jogo {
+		height: 200px;
+	}
+}
+</style>
+
+<div class="row">
+<%
+	for (let i = 0, jogo = null; i < lista.length; i++) {
+		jogo = lista[i];
+		if (i && !(i & 1)) {
+%>
+</div><div class="row">
+<% } %>
+
+	<div class="col-sm-6 wow fadeIn" data-wow-duration="3s" data-wow-delay="0.5s">
+		<div class="jogo" style="background-image: url('<%- root %>/<%- caminhoRelativoScreenshots %>/<%- jogo.id %>.<%- extensaoScreenshots %>?<%- jogo.versao %>')" onclick="if (event.target.className === 'jogo') window.open('<%= jogo.url_externa %>');">
+			<h2><a href="<%= jogo.url_externa %>" target="_blank"><%= jogo.nome %></a></h2>
+			<nav>
+				<% if (jogo.url_repositorio) { %>
+				<a title="Código-fonte do jogo" href="<%= jogo.url_repositorio %>" target="_blank"><i class="fa fa-code fa-nomargin"></i></a>
+				<% } %>
+				<% if (jogo.tipo_pontuacao) { %>
+				<a title="Leaderboard" href="<%- root %>/jogo/<%- jogo.id %>" target="_blank" style="float: right;"><i class="fa fa-trophy fa-nomargin"></i></a>
+				<% } %>
+			</nav>
+		</div>
+	</div>
+
+<% } %>
+</div>
+
+<script type="text/javascript">
+	//<![CDATA[
+
+	//]]>
+</script>

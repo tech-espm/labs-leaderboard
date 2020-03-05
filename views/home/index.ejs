@@ -1,8 +1,319 @@
-﻿
-<div style="max-width: 600px; margin: 0 auto; padding: 10% 15px;">
-	<div class="panel panel-default no-margin-bottom">
-		<div class="panel-body">
-			<a class="btn btn-primary" href="<%- root %>/login"><i class="fa fa-lock"></i>Login</a>
-		</div>
-	</div>
+﻿<div id="cover">
+	<div id="cover-anim"></div>
 </div>
+
+<header class="hdr-banner">
+	<h1 id="hdr-titulo"></h1>
+	<div id="hdr-logo">
+		<img alt="ESPM" width="256" src="<%- root %>/imagens/logo.png" />
+	</div>
+</header>
+
+<nav id="nav-fixed">
+	<ul>
+		<li>
+			<a href="<%- root %>/login"><i class="fa fa-lock"></i>Login</a>
+		</li>
+	</ul>
+</nav>
+
+<section class="sobre">
+	<p>
+		Esta é uma lista com alguns dos jogos produzidos pelos alunos e professores da ESPM. Você pode baixar o código-fonte dos jogos clicando no ícone <i class="fa fa-code fa-nomargin"></i>.
+	</p>
+	<p>
+		Alguns dos jogos possuem sistema de pontuação e leaderboard, que pode ser acessada pelo ícone <i class="fa fa-trophy fa-nomargin"></i>.
+	</p>
+	<p>
+		Para jogar, basta clicar na imagem 😊.
+	</p>
+</section>
+
+<div style="max-width: 1000px; margin: 0 auto; padding: 10% 15px;">
+	<%- include("jogos") %>
+</div>
+
+<%- contentFor("styles") %>
+<link href="<%- root %>/lib/animate/css/animate-3.7.2.min.css" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css?family=Montserrat|Press+Start+2P&display=swap" rel="stylesheet" />
+
+<style type="text/css">
+	html {
+		height: 100%;
+	}
+
+	body {
+		height: 100%;
+		min-height: 100%;
+		overflow: hidden;
+	}
+
+	#cover {
+		position: fixed;
+		left: 0;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		z-index: 100000;
+		background: no-repeat #222;
+		opacity: 1;
+		-webkit-transition: opacity ease-in-out .4s;
+		-o-transition: opacity ease-in-out .4s;
+		transition: opacity ease-in-out .4s;
+	}
+
+	@keyframes fadeBlinkAnimation {
+		0% {
+			opacity: 1;
+		}
+
+		50% {
+			opacity: 0.5;
+		}
+
+		100% {
+			opacity: 1;
+		}
+	}
+
+	@-o-keyframes fadeBlinkAnimation {
+		0% {
+			opacity: 1;
+		}
+
+		50% {
+			opacity: 0.5;
+		}
+
+		100% {
+			opacity: 1;
+		}
+	}
+
+	@-moz-keyframes fadeBlinkAnimation {
+		0% {
+			opacity: 1;
+		}
+
+		50% {
+			opacity: 0.5;
+		}
+
+		100% {
+			opacity: 1;
+		}
+	}
+
+	@-webkit-keyframes fadeBlinkAnimation {
+		0% {
+			opacity: 1;
+		}
+
+		50% {
+			opacity: 0.5;
+		}
+
+		100% {
+			opacity: 1;
+		}
+	}
+
+	#cover-anim {
+		position: absolute;
+		left: 0;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		background: url('<%- root %>/imagens/logo.png') no-repeat;
+		background-size: 256px 100px;
+		background-position: center center;
+		-webkit-animation: fadeBlinkAnimation 1s infinite;
+		-moz-animation: fadeBlinkAnimation 1s infinite;
+		-o-animation: fadeBlinkAnimation 1s infinite;
+		animation: fadeBlinkAnimation 1s infinite;
+	}
+
+	.hdr-banner {
+		position: relative;
+		padding: 100px 0 0;
+		width: 100%;
+		height: 100%;
+		min-height: 400px;
+		overflow: hidden;
+	}
+
+	#hdr-titulo {
+		position: absolute;
+		z-index: 1;
+		left: 0;
+		right: 0;
+		bottom: 50%;
+		margin: 0;
+		text-align: center;
+		padding: 20px;
+		font-family: 'Press Start 2P', monospace;
+		font-size: 40px;
+		font-weight: 400;
+		color: #fff;
+		text-shadow: 0 0 4px rgba(255,255,255,0.75);
+	}
+
+	#hdr-logo {
+		position: absolute;
+		z-index: 2;
+		text-align: center;
+		left: 0;
+		top: 50%;
+		margin: 200px 0 0;
+		width: 100%;
+		opacity: 0;
+		-webkit-transition: opacity ease-in .4s, margin-top ease-in .4s;
+		-o-transition: opacity ease-in .4s, margin-top ease-in .4s;
+		transition: opacity ease-in .4s, margin-top ease-in .4s;
+	}
+
+		#hdr-logo > img {
+			max-width: 100%;
+		}
+
+	#nav-fixed {
+		position: fixed;
+		overflow: hidden;
+		top: 50px;
+		right: 0;
+		text-align: right;
+		z-index: 9;
+		opacity: 0;
+		-webkit-transition: opacity ease-in .4s;
+		-o-transition: opacity ease-in .4s;
+		transition: opacity ease-in .4s;
+	}
+
+		#nav-fixed > ul {
+			list-style: none;
+			padding: 0;
+			margin: 0;
+		}
+
+			#nav-fixed > ul > li {
+				display: block;
+				padding: 0;
+				margin: 20px 0 20px 20px;
+				white-space: nowrap;
+			}
+
+				#nav-fixed > ul > li > a {
+					display: inline-block;
+					font-size: 20px;
+					color: rgba(0,0,0,0.55);
+					background-color: rgba(255,255,255,0.5);
+					padding: 5px 10px;
+					border-radius: 20px 0 0 2px;
+					width: 32px;
+					-webkit-box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+					box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+					-webkit-transition: width ease-in-out .2s, background-color ease-in-out .2s, color ease-in-out .2s;
+					-o-transition: width ease-in-out .2s, background-color ease-in-out .2s, color ease-in-out .2s;
+					transition: width ease-in-out .2s, background-color ease-in-out .2s, color ease-in-out .2s;
+				}
+
+					#nav-fixed > ul > li > a:hover {
+						color: #4170fa;
+						background-color: #fff;
+						width: 120px;
+					}
+
+	.sobre {
+		text-align: center;
+		padding: 100px;
+		color: #fff;
+		font-size: 25px;
+		background: rgba(0,0,0,0.5);
+		-webkit-box-shadow: 0 0 8px #000;
+		box-shadow: 0 0 8px #000;
+	}
+
+@media (max-width: 500px) {
+	#hdr-titulo {
+		font-size: 30px;
+	}
+
+	.sobre {
+		padding: 50px;
+		font-size: 20px;
+	}
+}
+
+@media (max-width: 400px) {
+	#hdr-titulo {
+		font-size: 25px;
+	}
+}
+
+</style>
+
+<%- contentFor("scripts") %>
+<script type="text/javascript" src="<%- root %>/lib/wow/js/wow-1.3.0.min.js"></script>
+
+<script type="text/javascript">
+	//<![CDATA[
+	"use strict";
+
+	new WOW().init();
+
+	var ok = false, atraso = true, titulo = "Leaderboard",
+		cover = document.getElementById("cover"),
+		navFixedVisivel = false,
+		navFixed = document.getElementById("nav-fixed");
+
+	function removerCover() {
+		if (atraso) {
+			atraso = false;
+			setTimeout(removerCover, 400);
+			return;
+		}
+
+		if (ok)
+			return;
+
+		ok = true;
+		cover.style.opacity = 0;
+		document.body.style.overflow = "auto";
+		setTimeout(function () {
+			var hdrTitulo = document.getElementById("hdr-titulo"), tituloAtual = 0;
+			function proximaLetraTitulo() {
+				hdrTitulo.textContent = titulo.substr(0, ++tituloAtual);
+				if (tituloAtual < titulo.length) {
+					setTimeout(proximaLetraTitulo, 50);
+				} else {
+					var hdrLogo = document.getElementById("hdr-logo");
+					hdrLogo.style.opacity = 1;
+					hdrLogo.style.marginTop = 0;
+				}
+			}
+			proximaLetraTitulo();
+
+			document.body.removeChild(cover);
+		}, 450);
+
+		function scrollHandler() {
+			var mostrarNavFixed = (window.scrollY >= 100);
+			if (navFixedVisivel === mostrarNavFixed) return;
+			navFixedVisivel = mostrarNavFixed;
+			navFixed.style.opacity = (mostrarNavFixed ? 1 : 0);
+		}
+
+		window.addEventListener("scroll", scrollHandler);
+
+		scrollHandler();
+	}
+
+	setTimeout(function () {
+		atraso = false;
+		removerCover();
+	}, 5000);
+
+	window.onload = removerCover;
+
+	//]]>
+</script>

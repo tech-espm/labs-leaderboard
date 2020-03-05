@@ -7,11 +7,15 @@ import appsettings = require("../appsettings");
 const router = express.Router();
 
 router.all("/", wrap(async (req: express.Request, res: express.Response) => {
+	res.render("home/index", { layout: "layout-externo", imagemFundo: true, caminhoRelativoScreenshots: Jogo.caminhoRelativoExterno, extensaoScreenshots: Jogo.extensaoImagem, lista: await Jogo.listar() });
+}));
+
+router.all("/admin", wrap(async (req: express.Request, res: express.Response) => {
 	let u = await Usuario.cookie(req);
 	if (!u)
-		res.render("home/index", { layout: "layout-externo", imagemFundo: true, lista: await Jogo.listar() });
+		res.redirect(appsettings.root + "/login");
 	else
-		res.render("home/dashboard", { usuario: u });
+		res.render("home/dashboard", { usuario: u, caminhoRelativoScreenshots: Jogo.caminhoRelativoExterno, extensaoScreenshots: Jogo.extensaoImagem, lista: await Jogo.listar() });
 }));
 
 router.all("/login", wrap(async (req: express.Request, res: express.Response) => {
@@ -23,19 +27,19 @@ router.all("/login", wrap(async (req: express.Request, res: express.Response) =>
 			if (mensagem)
 				res.render("home/login", { layout: "layout-externo", imagemFundo: true, mensagem: mensagem, loginUrl: appsettings.loginUrl });
 			else
-				res.redirect(appsettings.root + "/");
+				res.redirect(appsettings.root + "/admin");
 		} else {
 			res.render("home/login", { layout: "layout-externo", imagemFundo: true, mensagem: null, loginUrl: appsettings.loginUrl });
 		}
 	} else {
-		res.redirect(appsettings.root + "/");
+		res.redirect(appsettings.root + "/admin");
 	}
 }));
 
 router.get("/acesso", wrap(async (req: express.Request, res: express.Response) => {
 	let u = await Usuario.cookie(req);
 	if (!u) {
-		res.redirect(appsettings.root + "/");
+		res.redirect(appsettings.root + "/login");
 	} else {
 		res.render("home/acesso", { titulo: "Sem Permissão", usuario: u });
 	}
@@ -44,7 +48,7 @@ router.get("/acesso", wrap(async (req: express.Request, res: express.Response) =
 router.get("/perfil", wrap(async (req: express.Request, res: express.Response) => {
 	let u = await Usuario.cookie(req);
 	if (!u) {
-		res.redirect(appsettings.root + "/");
+		res.redirect(appsettings.root + "/login");
 	} else {
 		res.render("home/perfil", { titulo: "Meu Perfil", usuario: u });
 	}

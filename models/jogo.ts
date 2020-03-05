@@ -5,7 +5,8 @@ import Upload = require("../infra/upload");
 export = class Jogo {
 	public static readonly tamanhoMaximoImagemEmKiB = 512;
 	public static readonly tamanhoMaximoImagemEmBytes = Jogo.tamanhoMaximoImagemEmKiB << 10;
-	public static readonly caminhoRelativoPasta = "public/screenshots";
+	public static readonly caminhoRelativoExterno = "screenshots";
+	public static readonly caminhoRelativoPasta = "public/" + Jogo.caminhoRelativoExterno;
 	public static readonly extensaoImagem = "jpg";
 
 	public id: number;
