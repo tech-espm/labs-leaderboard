@@ -102,7 +102,6 @@ app.use("/usuario", require("./routes/usuario"));
 // API
 app.use("/api/jogo", require("./routes/api/jogo"));
 app.use("/api/jogador", require("./routes/api/jogador"));
-//app.use("/api/potuacao", require("./routes/api/pontuacao"));
 app.use("/api/usuario", require("./routes/api/usuario"));
 
 // Depois de registrados todos os caminhos das rotas e seus

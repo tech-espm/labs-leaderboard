@@ -46,6 +46,10 @@ window.leaderboard = {
 	login: function (url) {
 		window.location.href = leaderboard.root + "/jogador?callback=" + encodeURIComponent(url || window.location.href);
 	},
+	abrir: function (idjogo) {
+		if (idjogo && idjogo > 0)
+			window.open(leaderboard.root + "/jogo/" + idjogo);
+	},
 	marcar: function (jogador, idjogo, token, valor, callback) {
 		if (leaderboard.executando || !jogador || !jogador.id || !idjogo || idjogo <= 0 || !token || isNaN(valor))
 			return false;
