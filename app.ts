@@ -144,7 +144,7 @@ app.use(wrap(async (req: express.Request, res: express.Response, next: express.N
 //	res.render("shared/erro", { layout: "layout-externo", mensagem: err.message, erro: {} });
 //});
 
-app.set("port", process.env.PORT || 1337);
+app.set("port", process.env.PORT || 3001);
 
 const server = app.listen(app.get("port"), process.env.IP || "127.0.0.1", () => {
 	debug("Express server listening on port " + server.address()["port"]);
