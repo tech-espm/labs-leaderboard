@@ -104,10 +104,8 @@
 
 				var reader = new FileReader();
 				reader.onload = function () {
-					debugger;
 					var image = new Image();
 					image.onload = function () {
-						debugger;
 						var w = image.width, h = image.height;
 
 						preparandoImagem = false;
@@ -132,7 +130,6 @@
 			}
 
 			function terminar(temImagem) {
-				debugger;
 				//<% if (item) { %>
 
 				JsonWebApi.postFormData("<%- root %>/api/jogo/alterar", formData, function (response) {
