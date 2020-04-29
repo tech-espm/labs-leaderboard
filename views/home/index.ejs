@@ -259,7 +259,9 @@
 	//<![CDATA[
 	"use strict";
 
-	new WOW().init();
+	new WOW({
+		live: false
+	}).init();
 
 	var ok = false, atraso = true, titulo = "Leaderboard",
 		cover = document.getElementById("cover"),
