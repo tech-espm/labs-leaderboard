@@ -45,7 +45,7 @@ export = class Jogo {
 		let lista: Jogo[] = null;
 
 		await Sql.conectar(async (sql: Sql) => {
-			lista = await sql.query("select id, idusuario, nome, token, url_externa, url_repositorio, date_format(data_cadastro, '%d/%m/%Y') data_cadastro, ordem, tipo_pontuacao, versao from jogo") as Jogo[];
+			lista = await sql.query("select id, idusuario, nome, token, url_externa, url_repositorio, date_format(data_cadastro, '%d/%m/%Y') data_cadastro, ordem, tipo_pontuacao, versao from jogo order by ordem asc") as Jogo[];
 		});
 
 		return (lista || []);
@@ -155,6 +155,26 @@ export = class Jogo {
 			}
 
 			res = sql.linhasAfetadas.toString();
+
+			await sql.commit();
+		});
+
+		return res;
+	}
+
+	public static async salvarOrdem(ids: number[]): Promise<string> {
+		let res: string = null;
+
+		await Sql.conectar(async (sql: Sql) => {
+			await sql.beginTransaction();
+
+			for (let i = 0; i < ids.length; i++) {
+				await sql.query("update jogo set ordem = ? where id = ?", [i + 1, ids[i]]);
+				if (!sql.linhasAfetadas) {
+					res = `Jogo com id ${ids[i]} não encontrado`;
+					return;
+				}
+			}
 
 			await sql.commit();
 		});

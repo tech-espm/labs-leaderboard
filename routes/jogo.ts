@@ -38,6 +38,15 @@ router.get("/listar", wrap(async (req: express.Request, res: express.Response) =
 	}
 }));
 
+router.get("/ordenar", wrap(async (req: express.Request, res: express.Response) => {
+	let u = await Usuario.cookie(req);
+	if (!u) {
+		res.redirect(appsettings.root + "/acesso");
+	} else {
+		res.render("jogo/ordenar", { titulo: "Ordenar Jogos", usuario: u, lista: await Jogo.listar() });
+	}
+}));
+
 // Deve deixar por último, senão id poderia ser parte de um caminho, como "listar"!
 router.get("/:i", wrap(async (req: express.Request, res: express.Response) => {
 	let j: Jogo = null;

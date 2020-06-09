@@ -61,6 +61,22 @@ router.get("/excluir", wrap(async (req: express.Request, res: express.Response) 
 	jsonRes(res, 400, isNaN(id) ? "Dados inválidos!" : await Jogo.excluir(id));
 }));
 
+router.post("/salvarOrdem", wrap(async (req: express.Request, res: express.Response) => {
+	let ids = req.body as number[];
+	if (!ids || !ids.length) {
+		jsonRes(res, 400, "Dados inválidos!");
+		return;
+	}
+	for (let i = ids.length - 1; i >= 0; i--) {
+		ids[i] = parseInt(req.body[i]);
+		if (isNaN(ids[i]) || ids[i] <= 0) {
+			jsonRes(res, 400, "Dados inválidos!");
+			return;
+		}
+	}
+	jsonRes(res, 400, await Jogo.salvarOrdem(ids));
+}));
+
 router.all("/listarPontuacao", wrap(async (req: express.Request, res: express.Response) => {
 	allowCors(res);
 	let idjogo = parseInt(req.query["idjogo"]);
