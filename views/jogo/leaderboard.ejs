@@ -57,6 +57,29 @@
 	//<![CDATA[
 	"use strict";
 
+	// <% if (tipo_pontuacao >= 3 && tipo_pontuacao <= 4) { %>
+	function formatarValor(v) {
+		var ret = "", h, m, s;
+		if (v < 0) {
+			ret = "-";
+			v = -v;
+		}
+		v = v | 0;
+		h = (v / 3600) | 0;
+		m = ((v / 60) | 0) % 60;
+		s = v % 60;
+		if (h)
+			ret += h + "h ";
+		if (h || m)
+			ret += (h ? format2(m) : m) + "m ";
+		return ret + ((h || m) ? format2(s) : s) + "s";
+	}
+	// <% } else { %>
+	function formatarValor(v) {
+		return v.toFixed(2).replace(".", ",").replace(",00", "");
+	}
+	// <% } %>
+
 	function listar(lista, hoje) {
 		Notification.hide();
 
@@ -79,7 +102,7 @@
 				html += '<h3 class="clearfix">';
 				if (i <= 2)
 					html += '<i class="fa fa-trophy"></i>';
-				html += (i + 1) + 'º lugar&nbsp;<b>' + item.valor + '</b></h3>';
+				html += (i + 1) + 'º lugar&nbsp;<b>' + formatarValor(item.valor) + '</b></h3>';
 				if (hoje)
 					html += '<div class="item-lb-data"><i class="fa fa-clock-o"></i>' + item.hora + '</div>';
 				else

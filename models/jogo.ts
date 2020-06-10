@@ -37,7 +37,8 @@ export = class Jogo {
 		j.url_repositorio = (j.url_repositorio || "").normalize().trim();
 		if (j.url_repositorio.length > 200)
 			return "URL do repositório inválida";
-		j.tipo_pontuacao = (j.tipo_pontuacao ? 1 : 0);
+		if (isNaN(j.tipo_pontuacao) || j.tipo_pontuacao < 0)
+		return "Tipo de pontuação inválido";
 		return null;
 	}
 
@@ -182,11 +183,18 @@ export = class Jogo {
 		return res;
 	}
 
+	private static async ordemPontuacao(sql: Sql, id: number): Promise<string> {
+		const tipo_pontuacao: number = await sql.scalar("select tipo_pontuacao from jogo where id = ?", [id]);
+		return (tipo_pontuacao ? ((tipo_pontuacao & 1) ? "desc" : "asc") : null);
+	}
+
 	public static async listarPontuacao(id: number): Promise<any[]> {
 		let res: any[] = null;
 
 		await Sql.conectar(async (sql: Sql) => {
-			res = await sql.query("select p.id, p.valor, jo.email, jo.nome, date_format(p.data, '%d/%m/%Y') dia, date_format(p.data, '%H:%i') hora from pontuacao p inner join jogador jo on jo.id = p.idjogador where p.idjogo = ? order by p.valor desc, p.id asc limit 100", [id]);
+			const ordem = await Jogo.ordemPontuacao(sql, id);
+
+			res = await sql.query(`select p.id, p.valor, jo.email, jo.nome, date_format(p.data, '%d/%m/%Y') dia, date_format(p.data, '%H:%i') hora from pontuacao p inner join jogador jo on jo.id = p.idjogador where p.idjogo = ? order by p.valor ${ordem}, p.id asc limit 100`, [id]);
 		});
 
 		return res || [];
@@ -196,7 +204,9 @@ export = class Jogo {
 		let res: any[] = null;
 
 		await Sql.conectar(async (sql: Sql) => {
-			res = await sql.query("select p.id, p.valor, jo.email, jo.nome, date_format(p.data, '%d/%m/%Y') dia, date_format(p.data, '%H:%i') hora from pontuacao p inner join jogador jo on jo.id = p.idjogador where p.idjogo = ? and p.data between ? and ? order by p.valor desc, p.id asc", [id, dataInicial + " 00:00:00", (dataFinal || dataInicial) + " 23:59:59.9999"]);
+			const ordem = await Jogo.ordemPontuacao(sql, id);
+
+			res = await sql.query(`select p.id, p.valor, jo.email, jo.nome, date_format(p.data, '%d/%m/%Y') dia, date_format(p.data, '%H:%i') hora from pontuacao p inner join jogador jo on jo.id = p.idjogador where p.idjogo = ? and p.data between ? and ? order by p.valor ${ordem}, p.id asc`, [id, dataInicial + " 00:00:00", (dataFinal || dataInicial) + " 23:59:59.9999"]);
 		});
 
 		return res || [];
