@@ -37,7 +37,7 @@ router.all("/marcar", wrap(async (req: express.Request, res: express.Response) =
 	let idjogador = parseInt(req.query["idjogador"]);
 	let idjogo = parseInt(req.query["idjogo"]);
 	let token = req.query["token"] as string;
-	let valor = parseFloat(req.query["valor"]);
+	let valor = parseFloat((req.query["valor"] as string || "").replace(",", "."));
 	jsonRes(res, 400, (isNaN(idjogador) || idjogador <= 0 || isNaN(idjogo) || idjogo <= 0 || !token || isNaN(valor)) ? "Dados inválidos!" : await Jogador.marcar(idjogador, idjogo, token, valor));
 }));
 

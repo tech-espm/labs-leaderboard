@@ -9,6 +9,7 @@
 							<th>Ordem</th>
 							<th class="col-max">Nome</th>
 							<th class="col-min text-center">Imagem</th>
+							<th class="col-min text-right">Criação</th>
 						</tr>
 					</thead>
 					<tbody id="tabelaCorpo" class="content-section">
@@ -19,6 +20,7 @@
 							<td class="col-min text-center">
 								<a target="_blank" title="Imagem do jogo" href="<%- root %>/screenshots/<%- jogo.id %>.jpg?<%- jogo.versao %>" class="btn btn-outline btn-default"><i class="fa fa-nomargin fa-image"></i></a>
 							</td>
+							<td class="col-min text-right"><%= jogo.data_cadastro %></td>
 						</tr>
 						<% } %>
 					</tbody>

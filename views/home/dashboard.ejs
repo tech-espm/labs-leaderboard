@@ -1,6 +1,84 @@
 ﻿
 <div class="row">
 	<div class="col-lg-12">
+		<div class="panel panel-body text-center">
+			<h2 class="no-margin-top">
+				Integração com a Leaderboard
+			</h2>
+
+			<hr />
+
+			<h2>
+				Passo 1: Fazer login do jogador
+			</h2>
+			<h3>
+				Opção 1
+			</h3>
+			<p>
+				Abrir o link <span class="link">https://academico.espm.br/jogos/jogador</span> em uma nova aba (o jogador precisará voltar para o jogo manualmente depois de ter efetuado o cadastro/login, mas não precisa recarregar a página do jogo).
+			</p>
+			<h3>
+				Opção 2
+			</h3>
+			<p>
+				Abrir o link <span class="link">https://academico.espm.br/jogos/jogador?callback=&lt;SITE DO JOGO&gt;</span> na mesma aba (depois de ter efetuado o cadastro/login, o jogador será redirecionado de volta à página do jogo, que será recarregada).
+			</p>
+
+			<hr />
+
+			<h2>
+				Passo 2: Obter as informações do jogador
+			</h2>
+			<p>
+				Enviar uma requisição GET para <span class="link">https://academico.espm.br/jogos/api/jogador/cookie</span>, utilizando a API fetch ou AJAX, e esperar um objeto JSON de volta com as informações do jogador atualmente logado, ou null, caso não exista um jogador logado.
+			</p>
+			<p>
+				O objeto JSON vem da seguinte forma:
+				<br />
+				<span class="link">{"id":123,"email":"jogador@site.com","nome":"Nome do Jogador"}</span>
+			</p>
+
+			<hr />
+
+			<h2>
+				Passo 3: Enviar a pontuação final do jogador
+			</h2>
+			<p>
+				Enviar uma requisição GET para <span class="link">https://academico.espm.br/jogos/api/jogador/marcar?idjogador=www&idjogo=xxx&token=yyy&valor=zzz</span>, utilizando a API fetch ou AJAX, com as informações pedidas na query string, conforme explicado abaixo:
+			</p>
+			<ul>
+				<li><b>idjogador</b>: id do jogador, obtido no passo 2.</li>
+				<li><b>idjogo</b>: id do jogo, obtido do sistema.</li>
+				<li><b>token</b>: token de acesso, obtido do sistema.</li>
+				<li><b>valor</b>: pontuação/tempo a ser marcado (pode ser um número inteiro ou real).</li>
+			</ul>
+
+			<hr />
+
+			<h2>
+				Passo 4: Exibir a leaderboard do jogo
+			</h2>
+			<p>
+				Abrir o link <span class="link">https://academico.espm.br/jogos/jogo/&lt;ID DO JOGO&gt;</span> em uma nova aba.
+			</p>
+		</div>
 		<%- include("jogos") %>
 	</div>
 </div>
+
+<%- contentFor("styles") %>
+<style type="text/css">
+	.link {
+		word-wrap: break-word;
+		font-weight: bold;
+		font-family: Consolas, monospace;
+	}
+
+	li {
+		list-style-position: inside;
+	}
+
+	hr {
+		margin: 50px 0;
+	}
+</style>

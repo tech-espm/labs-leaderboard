@@ -45,7 +45,7 @@
 			{ title: "Imagem", "class": "text-center", searchable: false, orderable: false, data: null, render: function (v, type, row) { return "<a target=\"_blank\" title=\"Imagem do jogo\" href=\"<%- root %>/screenshots/" + row.id + ".jpg?" + row.versao + "\" class=\"btn btn-outline btn-default\"><i class=\"fa fa-nomargin fa-image\"></i></a>"; } },
 			{ title: "URL Externa", "class": "text-center", data: { "_": "url_externa", "display": function (row, type, set, meta) { var e = encode(row.url_externa); return (e ? "<a target=\"_blank\" title=\"Acessar jogo\" href=\"" + e + "\" class=\"btn btn-outline btn-default\"><i class=\"fa fa-nomargin fa-external-link\"></i></a>" : ""); } } },
 			{ title: "URL do Repositório", "class": "text-center", data: { "_": "url_repositorio", "display": function (row, type, set, meta) { var e = encode(row.url_repositorio); return (e ? "<a target=\"_blank\" title=\"Acessar repositório\" href=\"" + e + "\" class=\"btn btn-outline btn-default\"><i class=\"fa fa-nomargin fa-code\"></i></a>" : ""); } } },
-			{ title: "Criação", "class": "col-min", "type": "customdateint", data: "data_cadastro" },
+			{ title: "Criação", "class": "col-min", "type": "customdateint", data: "data_cadastro" }
 		],
 		data: <%- lista %>,
 		export: { title: "Jogos" }
