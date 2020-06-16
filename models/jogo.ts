@@ -194,7 +194,7 @@ export = class Jogo {
 		await Sql.conectar(async (sql: Sql) => {
 			const ordem = await Jogo.ordemPontuacao(sql, id);
 
-			res = await sql.query(`select p.id, p.valor, jo.email, jo.nome, date_format(p.data, '%d/%m/%Y') dia, date_format(p.data, '%H:%i') hora from pontuacao p inner join jogador jo on jo.id = p.idjogador where p.idjogo = ? order by p.valor ${ordem}, p.id asc limit 100`, [id]);
+			res = (!ordem ? null : await sql.query(`select p.id, p.valor, jo.email, jo.nome, date_format(p.data, '%d/%m/%Y') dia, date_format(p.data, '%H:%i') hora from pontuacao p inner join jogador jo on jo.id = p.idjogador where p.idjogo = ? order by p.valor ${ordem}, p.id asc limit 100`, [id]));
 		});
 
 		return res || [];
@@ -206,7 +206,7 @@ export = class Jogo {
 		await Sql.conectar(async (sql: Sql) => {
 			const ordem = await Jogo.ordemPontuacao(sql, id);
 
-			res = await sql.query(`select p.id, p.valor, jo.email, jo.nome, date_format(p.data, '%d/%m/%Y') dia, date_format(p.data, '%H:%i') hora from pontuacao p inner join jogador jo on jo.id = p.idjogador where p.idjogo = ? and p.data between ? and ? order by p.valor ${ordem}, p.id asc`, [id, dataInicial + " 00:00:00", (dataFinal || dataInicial) + " 23:59:59.9999"]);
+			res = (!ordem ? null : await sql.query(`select p.id, p.valor, jo.email, jo.nome, date_format(p.data, '%d/%m/%Y') dia, date_format(p.data, '%H:%i') hora from pontuacao p inner join jogador jo on jo.id = p.idjogador where p.idjogo = ? and p.data between ? and ? order by p.valor ${ordem}, p.id asc`, [id, dataInicial + " 00:00:00", (dataFinal || dataInicial) + " 23:59:59.9999"]));
 		});
 
 		return res || [];
